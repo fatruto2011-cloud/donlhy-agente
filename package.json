@@ -1,0 +1,12 @@
+{
+  "name": "donlhy-agente",
+  "version": "1.0.0",
+  "main": "agent.js",
+  "scripts": {
+    "start": "node agent.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "axios": "^1.6.0"
+  }
+}
