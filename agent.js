@@ -7,7 +7,7 @@ const WHATSAPP_TOKEN = process.env.WHATSAPP_TOKEN;
 const VERIFY_TOKEN   = process.env.VERIFY_TOKEN;
 const ANTHROPIC_KEY  = process.env.ANTHROPIC_KEY;
 const PHONE_ID       = process.env.PHONE_NUMBER_ID;
-const OWNER_PHONE    = '573128845147';
+const OWNER_PHONES   = ['573128845147', '573152591416'];
 
 const chats = {};
 
@@ -21,19 +21,23 @@ DATOS DEL NEGOCIO:
 - WhatsApp: 3128845147 | Alterno: 3127439449
 - Domicilios a todos los barrios de Apartadó
 - Costo de envío varía según barrio, un asesor confirma el valor
+- Link de la carta: https://canva.link/tt07ygz7619v470
 
-HORARIO DE ATENCIÓN (las pizzas solo se pueden pedir en estos horarios):
-- Lunes: 2pm a 10pm
-- Martes y miércoles: 3pm a 10pm
-- Jueves: 2pm a 10pm
-- Viernes: 1pm a 11pm
-- Sábado: 1pm a 11pm
-- Domingo: 1pm a 10pm
+HORARIO DE ATENCIÓN:
+- Lunes a jueves: 3pm a 10pm
+- Viernes y sábado: 2pm a 11pm
+- Domingo: 2pm a 10pm
+- Si es festivo: domingo y lunes inician desde las 2pm (horario de cierre igual)
 Si alguien escribe fuera del horario diles amablemente que estamos cerrados pero pueden programar su pedido para cuando abramos.
 
 TIEMPO ESTIMADO:
 - Domicilio: 30 a 45 minutos
 - Para recoger en el local: 25 minutos
+
+MEDIOS DE PAGO:
+- Efectivo
+- Transferencia bancaria: Bancolombia ahorros, cuenta 10852443314, a nombre de Maritza Torres Galvis
+Preguntar siempre al cliente cómo desea pagar al confirmar el pedido.
 
 TAMAÑOS DE PIZZA Y PORCIONES:
 - Personal: 2 porciones
@@ -45,8 +49,8 @@ TAMAÑOS DE PIZZA Y PORCIONES:
 
 REGLA DE 2 SABORES:
 - Desde Pequeña (4 porciones) en adelante se pueden pedir 2 sabores.
-- Pizza Personal (2 porciones) NO puede dividirse, solo 1 sabor.
-- Solo ofrecer esta opción si el cliente la solicita. No preguntarlo proactivamente.
+- Pizza Personal (2 porciones): si el cliente pide 2 sabores, decirle amablemente que en la personal solo es posible un sabor.
+- Solo mencionar esta opción si el cliente la solicita, no preguntarlo proactivamente.
 
 PIZZAS CON PRECIOS (Personal/Pequeña/SM6/Mediana/Familiar/Extra):
 Hawaiana (jamón, piña y queso): $16k/$28k/$43k/$55k/$82k/$100k
@@ -80,24 +84,28 @@ Pollo: $16k/$27k/$48k
 Mixta (pollo y carne): $15k/$25k/$45k
 Carne: $15k/$25k/$45k
 Marinera o camarones: $25k/$45k/$86k
-Plátano maduro: $16k/$25k/$48k — SOLO disponible en tamaño Personal (1 libra) y Grande (1 kilo). Si el cliente pide lasaña de plátano maduro, preguntar si la quiere mixta (con pollo y carne) o solo de carne.
+Plátano maduro: $16k/$25k/$48k — SOLO disponible en Personal (1 libra) y Grande (1 kilo).
+Si el cliente pide lasaña de plátano maduro, preguntar si la quiere mixta (pollo y carne) o solo de carne.
 
 SÁNDWICHES:
 Se arman en el momento:
 - Sándwich jamón y queso: $9k
-- Sándwich gratinado: $9k
+- Sándwich gratinado: $15k
+- Sándwich de pollo: $15k
 Por encargo (pedir con anticipación):
 - Sándwich tipo Subway: $19k
 - Sándwich ranchero: $19k
-- Sándwich de pollo: $15k
 
 OTROS: Empanadas chilenas $8k | Canastas de pollo $10k
 
+REFRIGERIOS (disponibles a partir de las 12pm, aplica para canastas y sándwiches):
+- Precios por definir — cuando un cliente pregunte por refrigerios después de las 12pm, decir que un asesor confirmará el precio.
+
 BEBIDAS:
 Jugos naturales en agua $7k | Jugos naturales en leche $8k
-Gaseosa 350ml $3k | Gaseosa personal $4.5k | Gaseosa 1.5L $8k | Mega gaseosa 2.5L $11k
+Gaseosa personal $4.5k | Gaseosa 1.5L $8k | Mega gaseosa 2.5L $11k
 Cerveza $5k | Soda saborizada $8k | Soda en vidrio (para llevar) $4k | Granizado $10k | Limonada $9k
-NOTA: No manejamos gaseosas en vidrio.
+NOTA: La gaseosa de 350ml NO está disponible para domicilios. Solo para consumo en el local.
 
 COMBOS CON MEGA:
 Cuando el cliente pida una Mega (gaseosa 2.5L), sumar $11k al total del pedido.
@@ -110,10 +118,13 @@ TOMAR PEDIDOS — recoge en orden:
 2. Si lleva Mexicana: ¿con o sin picante?
 3. Adicionales y su costo sumado al total
 4. ¿Domicilio o para recoger?
-5. Si domicilio: dirección y nombre
-6. Al confirmar, informar tiempo estimado: 30-45 min domicilio / 25 min para recoger
+5. Si es domicilio: NO ofrecer gaseosa 350ml
+6. Dirección y nombre (si es domicilio)
+7. Medio de pago: ¿efectivo o transferencia?
+8. Al confirmar, informar tiempo estimado: 30-45 min domicilio / 25 min para recoger
+9. Si paga por transferencia, dar datos: Bancolombia ahorros, cuenta 10852443314, Maritza Torres Galvis
 
-Cuando tengas todo confirma el resumen con el TOTAL y di "listo parce, el equipo lo está confirmando ahora mismo 🙌"
+Cuando tengas todo confirma el resumen con el TOTAL incluyendo: qué se pidió, valor total, si es domicilio o recogen, dirección si aplica, y medio de pago. Luego di "listo parce, el equipo lo está confirmando ahora mismo 🙌"
 
 CAMBIOS EN PEDIDO: di "espera un momento, lo consulto con el equipo" y notifica al dueño.
 ESTADO DOMICILIO: di "déjame consultar con el equipo" y notifica al dueño.
@@ -188,11 +199,16 @@ app.post('/webhook', async (req, res) => {
 
     if (esCambio || esEstado) {
       const tipo = esCambio ? '🔄 CAMBIO DE PEDIDO' : '🛵 CONSULTA DOMICILIO';
-      await enviarMensaje(OWNER_PHONE, `${tipo}\nCliente: ${from}\nMensaje: "${text}"`);
+      for (const numero of OWNER_PHONES) {
+        await enviarMensaje(numero, `${tipo}\nCliente: ${from}\nMensaje: "${text}"`);
+      }
     }
 
     if (reply.toLowerCase().includes('confirmando ahora mismo')) {
-      await enviarMensaje(OWNER_PHONE, `🍕 NUEVO PEDIDO\nCliente: ${from}\n\n${reply}`);
+      const resumenPedido = `🍕 NUEVO PEDIDO DONLHY\n👤 Cliente: ${from}\n\n${reply}`;
+      for (const numero of OWNER_PHONES) {
+        await enviarMensaje(numero, resumenPedido);
+      }
       setTimeout(async () => {
         await enviarMensaje(from,
           '¡Ey! Esperamos que hayas disfrutado tu pedido de Donlhy 🍕\n\n' +
