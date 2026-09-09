@@ -43,18 +43,11 @@ Preguntar siempre al cliente cómo desea pagar al confirmar el pedido.
 Si el cliente elige transferencia, pedirle que envíen la foto del comprobante.
 
 TARIFAS DE DOMICILIO POR BARRIO:
-Cuando el cliente diga su barrio, informar el costo de domicilio correspondiente y sumarlo al total.
-
 $5.000: Policarpa, Obrero, El Concejo, Diana Cardona, Alfonso López, Antonio Roldán Betancur, San Fernando, Las Brisas, Primero de Mayo, Pueblo Nuevo, La Esperanza, San Judas, 9 de Octubre, La Cadena, El Paraíso, La Esmeralda, Parroquial, Fundadores, Manzanares, Vélez, Simón Bolívar, La Libertad, Laureles, La Serranía, Gualcalá, El Estadio, Nueva Civilización, Corrugados, Chinita, El Rosal, Ortiz, Los Álamos, Nuevo Apartadó, Torres de Comfama, Maderos, Heliconias, Centro, Sena, Villa Oreed
-
 $6.000: 20 de Enero, La Paz, La Alborada, La Arboleda, Santa María La Nueva, El Darién, Pueblo Quemado, Villa del Río, Banacol
-
 $7.000: Urbanización La Navarra, Mateguadua, Chicala, Panamericana, Porvenir
-
 $12.000: El Salvador
-
 $16.000: Control B
-
 Si el cliente menciona un barrio que no está en la lista, decir que un asesor confirmará el costo de envío.
 
 TAMAÑOS DE PIZZA Y PORCIONES:
@@ -86,7 +79,7 @@ Tropical frutas (piña, durazno, arándanos, cereza y queso): $19k/$30k/$44k/$56
 Ranchera (salami, pepperoni, chorizo, tocineta, maíz tierno y queso): $17k/$32k/$47k/$56k/$84k/$106k
 
 REGLA DE INGREDIENTES PERSONALIZADOS:
-Si el cliente pide una pizza con ingredientes específicos que no están en la carta, compara con las pizzas disponibles y asigna el precio de la que más se parezca. Explícale al cliente cuál pizza es la más similar.
+Si el cliente pide una pizza con ingredientes específicos que no están en la carta, compara con las pizzas disponibles y asigna el precio de la que más se parezca.
 
 ADICIONALES PIZZA (Personal/Pequeña/SM6/Mediana/Familiar/Extra):
 El valor del adicional SE SUMA al precio de la pizza.
@@ -95,65 +88,48 @@ Tocineta: $4k/$5k/$7k/$9k/$10k/$11k
 Maíz tierno: $4k/$6k/$7k/$9k/$10k/$11k
 Piña: $4k/$6k/$7k/$8k/$10k/$13k
 Queso extra: $4k/$8k/$10k/$12k/$16k/$18k
-Ejemplo: pizza mediana $55k + borde de queso $12k + domicilio $5k = TOTAL $72k
 
 LASAÑA (Mini=½ libra / Personal=1 libra / Grande=1 kilo):
 Pollo: $16k/$27k/$48k
 Mixta (pollo y carne): $15k/$25k/$45k
 Carne: $15k/$25k/$45k
 Marinera o camarones: $25k/$45k/$86k
-Plátano maduro: $16k/$25k/$48k — SOLO disponible en Personal (1 libra) y Grande (1 kilo).
-Si el cliente pide lasaña de plátano maduro, preguntar si la quiere mixta (pollo y carne) o solo de carne.
+Plátano maduro: $16k/$25k/$48k — SOLO en Personal y Grande. Preguntar si la quiere mixta o de carne.
 
 SÁNDWICHES:
-Se arman en el momento:
-- Sándwich jamón y queso: $9k
-- Sándwich gratinado: $15k
-- Sándwich de pollo: $15k
-Por encargo (pedir con anticipación):
-- Sándwich tipo Subway: $19k
-- Sándwich ranchero: $19k
+En el momento: Jamón y queso $9k | Gratinado $15k | Pollo $15k
+Por encargo: Subway $19k | Ranchero $19k
 
 OTROS:
 - Empanadas chilenas: $8k
 - Canastas de pollo: $10k — SE HACEN POR ENCARGO
 
 REFRIGERIOS:
-Si un cliente pregunta por refrigerios, decirle: "Espera un momento parce, te comunico con alguien del equipo que te puede ayudar con eso 🙌"
-No dar precios ni información de refrigerios. El sistema notificará automáticamente a Yasley.
+Si un cliente pregunta por refrigerios, decirle: "Espera un momento parce, te comunico con alguien del equipo 🙌"
+No dar precios ni información de refrigerios.
 
 BEBIDAS:
-Jugos naturales en agua $7k | Jugos naturales en leche $8k
-Gaseosa personal $4.5k | Gaseosa 1.5L $8k | Mega gaseosa 2.5L $11k
-Cerveza $5k | Soda saborizada $8k | Soda en vidrio (para llevar) $4k | Granizado $10k | Limonada $9k
-NOTA: La gaseosa de 350ml NO está disponible para domicilios. Solo para consumo en el local.
+Jugos en agua $7k | Jugos en leche $8k | Gaseosa personal $4.5k | Gaseosa 1.5L $8k | Mega 2.5L $11k
+Cerveza $5k | Soda saborizada $8k | Soda en vidrio $4k | Granizado $10k | Limonada $9k
+NOTA: Gaseosa 350ml solo en el local, NO para domicilios.
 
-TOMAR PEDIDOS — recoge en orden:
-1. Producto y tamaño (en porciones)
+TOMAR PEDIDOS:
+1. Producto y tamaño
 2. Si lleva Mexicana: ¿con o sin picante?
-3. Adicionales y su costo sumado al total
-4. ¿Domicilio o para recoger?
-5. Si es domicilio: pedir barrio → informar costo de envío → sumarlo al total
-6. Si es domicilio: NO ofrecer gaseosa 350ml
-7. Dirección y nombre
-8. Medio de pago: ¿efectivo o transferencia?
-9. Si paga por transferencia: Bancolombia ahorros, cuenta 10852443314, Maritza Torres Galvis — pedir foto del comprobante
-10. Informar tiempo estimado según tamaño y modalidad
+3. Adicionales
+4. ¿Domicilio o recoger?
+5. Si domicilio: barrio → costo envío → sumarlo
+6. Dirección y nombre
+7. Medio de pago
+8. Si transferencia: datos bancarios + pedir foto del comprobante
+9. Informar tiempo estimado
 
-Cuando tengas todo confirma el resumen con:
-✅ Qué se pidió
-✅ Valor productos
-✅ Costo domicilio (si aplica)
-✅ TOTAL
-✅ Domicilio o recogen
-✅ Dirección (si aplica)
-✅ Medio de pago
-
+Resumen final debe incluir: productos, valor, domicilio, total, dirección, medio de pago.
 Luego di "listo parce, el equipo lo está confirmando ahora mismo 🙌"
 
-CAMBIOS EN PEDIDO: di "espera un momento, lo consulto con el equipo" y notifica al dueño.
-ESTADO DOMICILIO: di "déjame consultar con el equipo" y notifica al dueño.
-ENCUESTA: No la manejes tú, la envía el sistema automáticamente.`;
+CAMBIOS: di "espera, lo consulto con el equipo" y notifica.
+DOMICILIO: di "déjame consultar con el equipo" y notifica.
+ENCUESTA: No la manejes tú, la envía el sistema.`;
 
 const ENCUESTA_TIEMPO = 60;
 
@@ -175,6 +151,21 @@ async function enviarMensaje(telefono, mensaje) {
   );
 }
 
+async function obtenerImagenBase64(mediaId) {
+  const mediaRes = await axios.get(
+    `https://graph.facebook.com/v18.0/${mediaId}`,
+    { headers: { Authorization: `Bearer ${WHATSAPP_TOKEN}` } }
+  );
+  const imageUrl = mediaRes.data.url;
+  const imgRes = await axios.get(imageUrl, {
+    headers: { Authorization: `Bearer ${WHATSAPP_TOKEN}` },
+    responseType: 'arraybuffer'
+  });
+  const base64 = Buffer.from(imgRes.data).toString('base64');
+  const contentType = imgRes.headers['content-type'] || 'image/jpeg';
+  return { base64, contentType };
+}
+
 app.get('/webhook', (req, res) => {
   if (req.query['hub.verify_token'] === VERIFY_TOKEN) {
     res.send(req.query['hub.challenge']);
@@ -187,9 +178,62 @@ app.post('/webhook', async (req, res) => {
   res.sendStatus(200);
   try {
     const msg = req.body?.entry?.[0]?.changes?.[0]?.value?.messages?.[0];
-    if (!msg || msg.type !== 'text') return;
+    if (!msg) return;
 
     const from = msg.from;
+
+    // IMAGEN — comprobante de pago
+    if (msg.type === 'image') {
+      const mediaId = msg.image.media_id || msg.image.id;
+      try {
+        const { base64, contentType } = await obtenerImagenBase64(mediaId);
+        const { data } = await axios.post(
+          'https://api.anthropic.com/v1/messages',
+          {
+            model: 'claude-sonnet-4-6',
+            max_tokens: 300,
+            messages: [{
+              role: 'user',
+              content: [
+                {
+                  type: 'image',
+                  source: { type: 'base64', media_type: contentType, data: base64 }
+                },
+                {
+                  type: 'text',
+                  text: 'El cliente envió una imagen. ¿Es un comprobante de pago o transferencia bancaria? Responde solo "SI" o "NO".'
+                }
+              ]
+            }]
+          },
+          {
+            headers: {
+              'x-api-key': ANTHROPIC_KEY,
+              'anthropic-version': '2023-06-01',
+              'Content-Type': 'application/json',
+            }
+          }
+        );
+
+        const esComprobante = data.content[0].text.toUpperCase().includes('SI');
+
+        if (esComprobante) {
+          await enviarMensaje(from, '✅ ¡Recibimos tu comprobante parce! El equipo lo está verificando y en breve confirmamos tu pedido 🙌');
+          for (const numero of OWNER_PHONES) {
+            await enviarMensaje(numero, `💳 COMPROBANTE DE PAGO\nCliente: ${from}\nAcaba de enviar foto del comprobante. Por favor verificar.`);
+          }
+        } else {
+          await enviarMensaje(from, '¡Hola! Recibimos tu imagen 📸 ¿En qué te podemos ayudar?');
+        }
+      } catch (e) {
+        await enviarMensaje(from, '✅ Recibimos tu imagen. El equipo la está revisando 🙌');
+      }
+      return;
+    }
+
+    // TEXTO
+    if (msg.type !== 'text') return;
+
     const text = msg.text.body;
 
     if (!chats[from]) chats[from] = [];
@@ -216,18 +260,17 @@ app.post('/webhook', async (req, res) => {
 
     const reply = data.content[0].text;
     chats[from].push({ role: 'assistant', content: reply });
-
     await enviarMensaje(from, reply);
 
-    // Notificar si pregunta por refrigerios
-    const esRefrigerio = text.toLowerCase().includes('refrigerio') || text.toLowerCase().includes('refrigerios');
+    // Refrigerios
+    const esRefrigerio = text.toLowerCase().includes('refrigerio');
     if (esRefrigerio) {
-      await enviarMensaje(YASLEY_PHONE, `🥤 CONSULTA REFRIGERIOS\nCliente: ${from}\nMensaje: "${text}"\n\nEl cliente está preguntando por refrigerios, por favor atenderlo.`);
+      await enviarMensaje(YASLEY_PHONE, `🥤 CONSULTA REFRIGERIOS\nCliente: ${from}\nMensaje: "${text}"\nPor favor atenderlo.`);
     }
 
-    // Notificar cambios o estado domicilio
+    // Cambios o estado domicilio
     const esCambio = text.toLowerCase().includes('cambiar') || text.toLowerCase().includes('cambio');
-    const esEstado = text.toLowerCase().includes('cómo va') || text.toLowerCase().includes('donde está') || text.toLowerCase().includes('domicilio');
+    const esEstado = text.toLowerCase().includes('cómo va') || text.toLowerCase().includes('donde está');
 
     if (esCambio || esEstado) {
       const tipo = esCambio ? '🔄 CAMBIO DE PEDIDO' : '🛵 CONSULTA DOMICILIO';
@@ -236,7 +279,7 @@ app.post('/webhook', async (req, res) => {
       }
     }
 
-    // Enviar resumen del pedido
+    // Pedido confirmado
     if (reply.toLowerCase().includes('confirmando ahora mismo')) {
       const resumenPedido = `🍕 NUEVO PEDIDO DONLHY\n👤 Cliente: ${from}\n\n${reply}`;
       for (const numero of OWNER_PHONES) {
