@@ -18,6 +18,12 @@ const API_BASE = 'https://api.dualhook.com/v25.0';
 const TELEGRAM_TOKEN   = process.env.TELEGRAM_TOKEN;
 const TELEGRAM_CHAT_ID = process.env.TELEGRAM_CHAT_ID;
 
+// URL pública del agente (para servir la carta en PDF)
+const PUBLIC_URL = process.env.PUBLIC_URL || 'https://donlhy-agente-production.up.railway.app';
+
+// Estado por conversación (para no avisar el pedido inicial dos veces)
+const estado = {};
+
 const chats = {};
 
 // ----- PAUSA POR INTERVENCIÓN HUMANA (coexistencia) -----
@@ -45,14 +51,21 @@ function estaPausado(cliente) {
 
 const SYSTEM = `Eres Donlhy, un restaurante y pizzería de Apartadó, Antioquia, Colombia.
 Hablas directamente como el negocio — nunca como bot ni asistente virtual.
-Tono joven, parcero, cercano. Respuestas cortas (2-4 líneas). Emojis con moderación.
-Usas "parce", "qué más", "bacano", "listo pues" con naturalidad.
+Tono CÁLIDO, cercano y muy amable, como quien atiende con cariño.
+Respuestas CORTAS (1-2 líneas cuando se pueda), al grano pero siempre dulces.
+Trata al cliente con calidez: puedes decir "amig@", "con gusto", "claro que sí", "¡listo!".
+NUNCA uses "parce". Emojis con moderación (1 o 2 por mensaje).
 
 DATOS DEL NEGOCIO:
 - Dirección: Calle 100B #95-60 Barrio Obrero Bloque 1, Apartadó (detrás de la Bomba Zeus vía Barrio López)
 - WhatsApp: 3128845147
-- Link de la carta: https://canva.link/tt07ygz7619v470
 Cuando te pregunten por la ubicación, solo dar la dirección. No preguntar si van a recoger o pedir domicilio a menos que el cliente lo indique.
+
+CARTA / MENÚ:
+Cuando el cliente pida ver la carta, el menú, las opciones o los precios en general, NO mandes ningún link.
+Responde algo cálido y breve (ej: "¡Con gusto! Te comparto nuestra carta 😊") y termina tu mensaje con la línea:
+@@CARTA@@
+El sistema le enviará automáticamente la carta en PDF. No menciones el PDF ni "el sistema".
 
 HORARIO DE ATENCIÓN:
 - Lunes a jueves: 3pm a 10pm
@@ -125,7 +138,7 @@ Pollo: $16k/$27k/$48k
 Mixta (pollo y carne): $15k/$25k/$45k
 Carne: $15k/$25k/$45k
 Marinera o camarones: $25k/$45k/$86k
-Plátano maduro: $16k/$25k/$48k — SOLO en Personal y Grande. Preguntar si la quiere mixta o de carne.
+Plátano maduro: $16k/$25k/$48k
 
 SÁNDWICHES:
 En el momento: Jamón y queso $9k | Gratinado $15k | Pollo $15k
@@ -136,30 +149,32 @@ OTROS:
 - Canastas de pollo: $10k — SE HACEN POR ENCARGO
 
 REFRIGERIOS:
-Si un cliente pregunta por refrigerios, decirle: "Espera un momento parce, te comunico con alguien del equipo 🙌"
+Si un cliente pregunta por refrigerios, decirle: "¡Con gusto! Espera un momentico, te comunico con alguien del equipo 🙌"
 No dar precios ni información de refrigerios.
 
 BEBIDAS:
-Jugos en agua $7k | Jugos en leche $8k | Gaseosa personal $4.5k | Gaseosa 1.5L $8k | Mega 2.5L $11k
+Jugos en agua $7k | Jugos en leche $8k | Gaseosa 350ml $3k | Gaseosa personal $4.5k | Gaseosa 1.5L $8k | Mega 2.5L $11k
 Cerveza $5k | Soda saborizada $8k | Soda en vidrio $4k | Granizado $10k | Limonada $9k
 NOTA: Gaseosa 350ml solo en el local, NO para domicilios.
 
-TOMAR PEDIDOS:
-1. Producto y tamaño
-2. Si lleva Mexicana: ¿con o sin picante?
-3. Adicionales
-4. ¿Domicilio o recoger?
-5. Si domicilio: barrio → costo envío → sumarlo
-6. Dirección y nombre
-7. Medio de pago
-8. Si transferencia: datos bancarios + pedir foto del comprobante
-9. Informar tiempo estimado
+TOMAR PEDIDOS (EN DOS MOMENTOS):
 
-Resumen final debe incluir: productos, valor, domicilio, total, dirección, medio de pago.
-Luego di "listo parce, el equipo lo está confirmando ahora mismo 🙌"
+MOMENTO 1 — Apenas tengas CLARO (a) qué pizza/producto quiere (sabor y tamaño) y (b) si es DOMICILIO o para RECOGER, termina tu mensaje con una línea aparte exactamente así:
+@@INICIAL@@ <resumen corto: producto + domicilio o recoger>
+Ejemplo: @@INICIAL@@ 1 pizza hawaiana familiar - domicilio
+Después sigue pidiendo con calidez y de a poco los datos que falten (dirección, nombre, forma de pago). No pidas todo de golpe, hazlo natural.
 
-CAMBIOS: di "espera, lo consulto con el equipo" y notifica.
-DOMICILIO: di "déjame consultar con el equipo" y notifica.
+MOMENTO 2 — Cuando YA tengas TODOS los datos (producto, domicilio/recoger, dirección si aplica, nombre, forma de pago), confirma al cliente con algo cálido (ej: "¡Listo! Tu pedido ya quedó, lo estamos preparando 🍕") y termina tu mensaje con:
+@@COMPLETO@@ <resumen completo: productos, valor, domicilio, total, dirección, nombre, forma de pago, tiempo estimado>
+
+REGLAS DE LAS SEÑALES:
+- Las líneas @@INICIAL@@ y @@COMPLETO@@ son señales internas para la cocina. El cliente NO las ve y tú NUNCA las mencionas ni explicas.
+- Emite @@INICIAL@@ una sola vez (la primera vez que haya claridad de pizza + domicilio/recoger).
+- Emite @@COMPLETO@@ una sola vez, al final, cuando ya esté todo.
+- Si lleva Mexicana, pregunta ¿con o sin picante? Si transferencia, da los datos bancarios y pide la foto del comprobante. Informa el tiempo estimado.
+
+CAMBIOS: di "claro, lo consulto con el equipo" y el sistema notifica.
+DOMICILIO: di "con gusto, déjame consultar con el equipo" y el sistema notifica.
 ENCUESTA: No la manejes tú, la envía el sistema.`;
 
 const ENCUESTA_TIEMPO = 60;
@@ -180,6 +195,28 @@ async function enviarMensaje(telefono, mensaje) {
       },
     }
   );
+}
+
+async function enviarDocumento(telefono, url, filename, caption) {
+  try {
+    await axios.post(
+      `${API_BASE}/${PHONE_ID}/messages`,
+      {
+        messaging_product: 'whatsapp',
+        to: telefono,
+        type: 'document',
+        document: { link: url, filename: filename, caption: caption },
+      },
+      {
+        headers: {
+          Authorization: `Bearer ${WHATSAPP_TOKEN}`,
+          'Content-Type': 'application/json',
+        },
+      }
+    );
+  } catch (e) {
+    console.error('Error enviar carta:', e.response?.data?.error?.message || e.message);
+  }
 }
 
 async function enviarTelegram(mensaje) {
@@ -208,6 +245,11 @@ async function obtenerImagenBase64(mediaId) {
   const contentType = imgRes.headers['content-type'] || 'image/jpeg';
   return { base64, contentType };
 }
+
+// Servir la carta en PDF (debe existir el archivo carta.pdf en el repo)
+app.get('/carta.pdf', (req, res) => {
+  res.sendFile(require('path').join(__dirname, 'carta.pdf'));
+});
 
 app.get('/webhook', (req, res) => {
   if (req.query['hub.verify_token'] === VERIFY_TOKEN) {
@@ -280,7 +322,7 @@ app.post('/webhook', async (req, res) => {
         const esComprobante = data.content[0].text.toUpperCase().includes('SI');
 
         if (esComprobante) {
-          await enviarMensaje(from, '✅ ¡Recibimos tu comprobante parce! El equipo lo está verificando y en breve confirmamos tu pedido 🙌');
+          await enviarMensaje(from, '✅ ¡Recibimos tu comprobante! El equipo lo está verificando y en breve confirmamos tu pedido 🙌');
           await enviarTelegram(`💳 COMPROBANTE DE PAGO\nCliente: ${from}\nAcaba de enviar foto del comprobante. Por favor verificar.`);
         } else {
           await enviarMensaje(from, '¡Hola! Recibimos tu imagen 📸 ¿En qué te podemos ayudar?');
@@ -296,7 +338,7 @@ app.post('/webhook', async (req, res) => {
     // para que ella escuche la nota desde la app si quiere atenderla.
     if (msg.type === 'audio' || msg.type === 'voice') {
       await enviarMensaje(from,
-        '¡Hola parce! 🍕 Por aquí te atiendo más rápido si me escribes tu pedido o tu pregunta 😊 ' +
+        '¡Hola! 🍕 Con gusto te atiendo. Por aquí es más rápido si me escribes tu pedido o tu pregunta 😊 ' +
         'Así no se me escapa ningún detalle. ¡Gracias!'
       );
       await enviarTelegram(
@@ -332,9 +374,65 @@ app.post('/webhook', async (req, res) => {
       }
     );
 
-    const reply = data.content[0].text;
+    // La respuesta del agente puede traer señales internas (el cliente NO las ve):
+    //   @@INICIAL@@  -> pedido con claridad (pizza + domicilio/recoger): aviso temprano
+    //   @@COMPLETO@@ -> pedido completo (todos los datos): aviso final + encuesta
+    //   @@CARTA@@    -> enviar la carta en PDF
+    let reply = data.content[0].text;
+    let resumenInicial = null;
+    let resumenCompleto = null;
+    let mandarCarta = false;
+
+    if (reply.includes('@@COMPLETO@@')) {
+      const i = reply.indexOf('@@COMPLETO@@');
+      resumenCompleto = reply.slice(i + 12).trim();
+      reply = reply.slice(0, i).trim();
+    } else if (reply.includes('@@INICIAL@@')) {
+      const i = reply.indexOf('@@INICIAL@@');
+      resumenInicial = reply.slice(i + 11).trim();
+      reply = reply.slice(0, i).trim();
+    }
+    if (reply.includes('@@CARTA@@')) {
+      mandarCarta = true;
+      reply = reply.replace('@@CARTA@@', '').trim();
+    }
+
+    // Guardamos en el historial la versión LIMPIA (sin señales)
     chats[from].push({ role: 'assistant', content: reply });
-    await enviarMensaje(from, reply);
+
+    if (reply) await enviarMensaje(from, reply);
+
+    // Carta en PDF (si la pidió)
+    if (mandarCarta) {
+      await enviarDocumento(
+        from,
+        `${PUBLIC_URL}/carta.pdf`,
+        'Carta Donlhy.pdf',
+        '🍕 ¡Nuestra carta! Cuando quieras me dices y armamos tu pedido 😊'
+      );
+    }
+
+    if (!estado[from]) estado[from] = {};
+
+    // MOMENTO 1 — pedido con claridad -> aviso temprano a cocina (una sola vez)
+    if (resumenInicial && !estado[from].inicial) {
+      estado[from].inicial = true;
+      await enviarTelegram(`🍕 NUEVO PEDIDO (preparando)\n👤 Cliente: ${from}\n\n${resumenInicial}`);
+    }
+
+    // MOMENTO 2 — pedido completo -> aviso final + encuesta
+    if (resumenCompleto) {
+      await enviarTelegram(`✅ PEDIDO COMPLETO\n👤 Cliente: ${from}\n\n${resumenCompleto}`);
+      estado[from] = {}; // reinicia para un próximo pedido del mismo cliente
+      setTimeout(async () => {
+        await enviarMensaje(from,
+          '¡Hola de nuevo! Esperamos que hayas disfrutado tu pedido de Donlhy 🍕\n\n' +
+          '¿Cómo calificarías tu experiencia?\n' +
+          '⭐ 1 - Muy malo\n⭐⭐ 2 - Malo\n⭐⭐⭐ 3 - Regular\n⭐⭐⭐⭐ 4 - Bueno\n⭐⭐⭐⭐⭐ 5 - Excelente\n\n' +
+          'Responde con el número 🙏'
+        );
+      }, ENCUESTA_TIEMPO * 60 * 1000);
+    }
 
     // Refrigerios
     const esRefrigerio = text.toLowerCase().includes('refrigerio');
@@ -345,24 +443,9 @@ app.post('/webhook', async (req, res) => {
     // Cambios o estado domicilio
     const esCambio = text.toLowerCase().includes('cambiar') || text.toLowerCase().includes('cambio');
     const esEstado = text.toLowerCase().includes('cómo va') || text.toLowerCase().includes('donde está');
-
     if (esCambio || esEstado) {
       const tipo = esCambio ? '🔄 CAMBIO DE PEDIDO' : '🛵 CONSULTA DOMICILIO';
       await enviarTelegram(`${tipo}\nCliente: ${from}\nMensaje: "${text}"`);
-    }
-
-    // Pedido confirmado
-    if (reply.toLowerCase().includes('confirmando ahora mismo')) {
-      const resumenPedido = `🍕 NUEVO PEDIDO DONLHY\n👤 Cliente: ${from}\n\n${reply}`;
-      await enviarTelegram(resumenPedido);
-      setTimeout(async () => {
-        await enviarMensaje(from,
-          '¡Ey! Esperamos que hayas disfrutado tu pedido de Donlhy 🍕\n\n' +
-          '¿Cómo calificarías tu experiencia?\n' +
-          '⭐ 1 - Muy malo\n⭐⭐ 2 - Malo\n⭐⭐⭐ 3 - Regular\n⭐⭐⭐⭐ 4 - Bueno\n⭐⭐⭐⭐⭐ 5 - Excelente\n\n' +
-          'Responde con el número 🙏'
-        );
-      }, ENCUESTA_TIEMPO * 60 * 1000);
     }
 
   } catch (err) {
