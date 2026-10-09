@@ -3,14 +3,45 @@ const axios   = require('axios');
 const app     = express();
 app.use(express.json());
 
-const WHATSAPP_TOKEN = process.env.WHATSAPP_TOKEN;
+const WHATSAPP_TOKEN = process.env.WHATSAPP_TOKEN;   // clave de Dualhook: dh_live_...
 const VERIFY_TOKEN   = process.env.VERIFY_TOKEN;
 const ANTHROPIC_KEY  = process.env.ANTHROPIC_KEY;
-const PHONE_ID       = process.env.PHONE_NUMBER_ID;
-const OWNER_PHONES   = ['573128845147', '573152591416'];
-const YASLEY_PHONE   = '573128845147';
+const PHONE_ID       = process.env.PHONE_NUMBER_ID;  // Phone Number ID de Dualhook: 1202232000133126
+
+// Coexistencia por Dualhook: los mensajes se ENVÍAN a la API de Dualhook,
+// que es compatible con la de Meta (mismo formato). Solo cambia la URL base.
+const API_BASE = 'https://api.dualhook.com/v25.0';
+
+// Número del agente (producción): 573128845147
+// Avisos y atención manual van a Yasley en OTRA línea, para que
+// el agente NO se mande mensajes a sí mismo.
+const OWNER_PHONES   = ['573123387881', '573152591416'];
+const YASLEY_PHONE   = '573123387881';
 
 const chats = {};
+
+// ----- PAUSA POR INTERVENCIÓN HUMANA (coexistencia) -----
+// Cuando Yasley responde a un cliente DESDE la app del celular, Meta manda
+// un evento "smb_message_echoes". El agente se pausa en ESE chat para no
+// pisar a la persona. Si Yasley no escribe en PAUSA_MINUTOS, el bot retoma.
+const pausados = {};
+const PAUSA_MINUTOS = 30;
+
+function pausarChat(cliente) {
+  if (!cliente) return;
+  pausados[cliente] = Date.now();
+  console.log(`⏸️  Humano respondió a ${cliente} desde la app. Agente en pausa ${PAUSA_MINUTOS} min.`);
+}
+
+function estaPausado(cliente) {
+  const t = pausados[cliente];
+  if (!t) return false;
+  if (Date.now() - t > PAUSA_MINUTOS * 60 * 1000) {
+    delete pausados[cliente];
+    return false;
+  }
+  return true;
+}
 
 const SYSTEM = `Eres Donlhy, un restaurante y pizzería de Apartadó, Antioquia, Colombia.
 Hablas directamente como el negocio — nunca como bot ni asistente virtual.
@@ -135,7 +166,7 @@ const ENCUESTA_TIEMPO = 60;
 
 async function enviarMensaje(telefono, mensaje) {
   await axios.post(
-    `https://graph.facebook.com/v18.0/${PHONE_ID}/messages`,
+    `${API_BASE}/${PHONE_ID}/messages`,
     {
       messaging_product: 'whatsapp',
       to: telefono,
@@ -153,7 +184,7 @@ async function enviarMensaje(telefono, mensaje) {
 
 async function obtenerImagenBase64(mediaId) {
   const mediaRes = await axios.get(
-    `https://graph.facebook.com/v18.0/${mediaId}`,
+    `${API_BASE}/${mediaId}`,
     { headers: { Authorization: `Bearer ${WHATSAPP_TOKEN}` } }
   );
   const imageUrl = mediaRes.data.url;
@@ -177,10 +208,29 @@ app.get('/webhook', (req, res) => {
 app.post('/webhook', async (req, res) => {
   res.sendStatus(200);
   try {
-    const msg = req.body?.entry?.[0]?.changes?.[0]?.value?.messages?.[0];
+    const value = req.body?.entry?.[0]?.changes?.[0]?.value;
+    if (!value) return;
+
+    // ECO (coexistencia): Yasley respondió a un cliente DESDE la app del celular.
+    // Pausamos al agente en ese chat para que no conteste encima de ella.
+    const echoes = value.smb_message_echoes;
+    if (Array.isArray(echoes) && echoes.length) {
+      for (const echo of echoes) {
+        pausarChat(echo.to);   // echo.to = cliente al que le respondió la persona
+      }
+      return;
+    }
+
+    const msg = value.messages?.[0];
     if (!msg) return;
 
     const from = msg.from;
+
+    // ¿Chat pausado porque un humano está atendiendo? El agente se calla.
+    if (estaPausado(from)) {
+      console.log(`🙊 Chat ${from} pausado (humano atendiendo). El agente no responde.`);
+      return;
+    }
 
     // IMAGEN — comprobante de pago
     if (msg.type === 'image') {
@@ -228,6 +278,20 @@ app.post('/webhook', async (req, res) => {
       } catch (e) {
         await enviarMensaje(from, '✅ Recibimos tu imagen. El equipo la está revisando 🙌');
       }
+      return;
+    }
+
+    // AUDIO / NOTA DE VOZ — Opción B: no se transcribe.
+    // El agente pide amablemente que escriban, y le avisa a Yasley
+    // para que ella escuche la nota desde la app si quiere atenderla.
+    if (msg.type === 'audio' || msg.type === 'voice') {
+      await enviarMensaje(from,
+        '¡Hola parce! 🍕 Por aquí te atiendo más rápido si me escribes tu pedido o tu pregunta 😊 ' +
+        'Así no se me escapa ningún detalle. ¡Gracias!'
+      );
+      await enviarMensaje(YASLEY_PHONE,
+        `🎤 NOTA DE VOZ\nCliente: ${from}\nTe envió un audio. Si quieres, escúchalo en la app y atiéndelo directamente.`
+      );
       return;
     }
 
