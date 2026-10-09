@@ -12,11 +12,11 @@ const PHONE_ID       = process.env.PHONE_NUMBER_ID;  // Phone Number ID de Dualh
 // que es compatible con la de Meta (mismo formato). Solo cambia la URL base.
 const API_BASE = 'https://api.dualhook.com/v25.0';
 
-// Número del agente (producción): 573128845147
-// Avisos y atención manual van a Yasley en OTRA línea, para que
-// el agente NO se mande mensajes a sí mismo.
-const OWNER_PHONES   = ['573123387881', '573152591416'];
-const YASLEY_PHONE   = '573123387881';
+// AVISOS POR TELEGRAM: los pedidos, comprobantes, cambios y notas de voz
+// se avisan al grupo de Telegram "Pedidos Donlhy" (instantáneo y gratis).
+// Así Yasley se entera aunque esté atendiendo una mesa.
+const TELEGRAM_TOKEN   = process.env.TELEGRAM_TOKEN;
+const TELEGRAM_CHAT_ID = process.env.TELEGRAM_CHAT_ID;
 
 const chats = {};
 
@@ -182,6 +182,18 @@ async function enviarMensaje(telefono, mensaje) {
   );
 }
 
+async function enviarTelegram(mensaje) {
+  if (!TELEGRAM_TOKEN || !TELEGRAM_CHAT_ID) return;
+  try {
+    await axios.post(
+      `https://api.telegram.org/bot${TELEGRAM_TOKEN}/sendMessage`,
+      { chat_id: TELEGRAM_CHAT_ID, text: mensaje }
+    );
+  } catch (e) {
+    console.error('Error Telegram:', e.response?.data?.description || e.message);
+  }
+}
+
 async function obtenerImagenBase64(mediaId) {
   const mediaRes = await axios.get(
     `${API_BASE}/${mediaId}`,
@@ -269,9 +281,7 @@ app.post('/webhook', async (req, res) => {
 
         if (esComprobante) {
           await enviarMensaje(from, '✅ ¡Recibimos tu comprobante parce! El equipo lo está verificando y en breve confirmamos tu pedido 🙌');
-          for (const numero of OWNER_PHONES) {
-            await enviarMensaje(numero, `💳 COMPROBANTE DE PAGO\nCliente: ${from}\nAcaba de enviar foto del comprobante. Por favor verificar.`);
-          }
+          await enviarTelegram(`💳 COMPROBANTE DE PAGO\nCliente: ${from}\nAcaba de enviar foto del comprobante. Por favor verificar.`);
         } else {
           await enviarMensaje(from, '¡Hola! Recibimos tu imagen 📸 ¿En qué te podemos ayudar?');
         }
@@ -289,8 +299,8 @@ app.post('/webhook', async (req, res) => {
         '¡Hola parce! 🍕 Por aquí te atiendo más rápido si me escribes tu pedido o tu pregunta 😊 ' +
         'Así no se me escapa ningún detalle. ¡Gracias!'
       );
-      await enviarMensaje(YASLEY_PHONE,
-        `🎤 NOTA DE VOZ\nCliente: ${from}\nTe envió un audio. Si quieres, escúchalo en la app y atiéndelo directamente.`
+      await enviarTelegram(
+        `🎤 NOTA DE VOZ\nCliente: ${from}\nTe envió un audio. Escúchalo en la app de WhatsApp y atiéndelo.`
       );
       return;
     }
@@ -329,7 +339,7 @@ app.post('/webhook', async (req, res) => {
     // Refrigerios
     const esRefrigerio = text.toLowerCase().includes('refrigerio');
     if (esRefrigerio) {
-      await enviarMensaje(YASLEY_PHONE, `🥤 CONSULTA REFRIGERIOS\nCliente: ${from}\nMensaje: "${text}"\nPor favor atenderlo.`);
+      await enviarTelegram(`🥤 CONSULTA REFRIGERIOS\nCliente: ${from}\nMensaje: "${text}"\nPor favor atenderlo.`);
     }
 
     // Cambios o estado domicilio
@@ -338,17 +348,13 @@ app.post('/webhook', async (req, res) => {
 
     if (esCambio || esEstado) {
       const tipo = esCambio ? '🔄 CAMBIO DE PEDIDO' : '🛵 CONSULTA DOMICILIO';
-      for (const numero of OWNER_PHONES) {
-        await enviarMensaje(numero, `${tipo}\nCliente: ${from}\nMensaje: "${text}"`);
-      }
+      await enviarTelegram(`${tipo}\nCliente: ${from}\nMensaje: "${text}"`);
     }
 
     // Pedido confirmado
     if (reply.toLowerCase().includes('confirmando ahora mismo')) {
       const resumenPedido = `🍕 NUEVO PEDIDO DONLHY\n👤 Cliente: ${from}\n\n${reply}`;
-      for (const numero of OWNER_PHONES) {
-        await enviarMensaje(numero, resumenPedido);
-      }
+      await enviarTelegram(resumenPedido);
       setTimeout(async () => {
         await enviarMensaje(from,
           '¡Ey! Esperamos que hayas disfrutado tu pedido de Donlhy 🍕\n\n' +
