@@ -493,6 +493,22 @@ async function iniciarTelegram() {
 app.get('/', (req, res) => res.send('Donlhy agente OK'));
 app.get('/health', (req, res) => res.send('ok'));
 
+// Diagnóstico temporal: prueba la llamada a Claude y muestra qué devuelve.
+app.get('/diag', async (req, res) => {
+  const H = { headers: { 'x-api-key': ANTHROPIC_KEY, 'anthropic-version': '2023-06-01', 'Content-Type': 'application/json' }, timeout: 20000 };
+  async function test(payload) {
+    try {
+      const { data } = await axios.post('https://api.anthropic.com/v1/messages', payload, H);
+      return { ok: true, stop: data.stop_reason, types: (data.content || []).map(c => c.type), text: (data.content?.[0]?.text || '').slice(0, 150), usage: data.usage };
+    } catch (e) {
+      return { ok: false, status: e.response?.status, error: JSON.stringify(e.response?.data || e.message).slice(0, 400) };
+    }
+  }
+  const simple = await test({ model: MODEL_TEXTO, max_tokens: 100, messages: [{ role: 'user', content: 'Di hola' }] });
+  const conSistema = await test({ model: MODEL_TEXTO, max_tokens: 100, system: [{ type: 'text', text: SYSTEM, cache_control: { type: 'ephemeral' } }, { type: 'text', text: 'contexto' }], messages: [{ role: 'user', content: 'Quiero una lasaña' }] });
+  res.json({ model: MODEL_TEXTO, keyPresent: !!ANTHROPIC_KEY, simple, conSistema });
+});
+
 app.get('/carta.pdf', (req, res) => {
   res.sendFile(require('path').join(__dirname, 'carta.pdf'));
 });
