@@ -499,14 +499,16 @@ app.get('/diag', async (req, res) => {
   async function test(payload) {
     try {
       const { data } = await axios.post('https://api.anthropic.com/v1/messages', payload, H);
-      return { ok: true, stop: data.stop_reason, types: (data.content || []).map(c => c.type), text: (data.content?.[0]?.text || '').slice(0, 150), usage: data.usage };
+      return { ok: true, stop: data.stop_reason, types: (data.content || []).map(c => c.type), text: (data.content?.find(c => c.type === 'text')?.text || '').slice(0, 150), usage: data.usage };
     } catch (e) {
       return { ok: false, status: e.response?.status, error: JSON.stringify(e.response?.data || e.message).slice(0, 400) };
     }
   }
-  const simple = await test({ model: MODEL_TEXTO, max_tokens: 100, messages: [{ role: 'user', content: 'Di hola' }] });
-  const conSistema = await test({ model: MODEL_TEXTO, max_tokens: 100, system: [{ type: 'text', text: SYSTEM, cache_control: { type: 'ephemeral' } }, { type: 'text', text: 'contexto' }], messages: [{ role: 'user', content: 'Quiero una lasaña' }] });
-  res.json({ model: MODEL_TEXTO, keyPresent: !!ANTHROPIC_KEY, simple, conSistema });
+  const sys = [{ type: 'text', text: SYSTEM, cache_control: { type: 'ephemeral' } }, { type: 'text', text: 'contexto' }];
+  const msg = [{ role: 'user', content: 'Quiero una lasaña' }];
+  const sinThinking = await test({ model: MODEL_TEXTO, max_tokens: 500, thinking: { type: 'disabled' }, system: sys, messages: msg });
+  const masTokens = await test({ model: MODEL_TEXTO, max_tokens: 1500, system: sys, messages: msg });
+  res.json({ model: MODEL_TEXTO, sinThinking, masTokens });
 });
 
 app.get('/carta.pdf', (req, res) => {
