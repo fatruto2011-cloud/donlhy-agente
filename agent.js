@@ -360,7 +360,7 @@ async function obtenerImagenBase64(mediaId) {
 // llegara a fallar por un tema del modelo, reintenta con el de respaldo (Sonnet).
 async function llamarClaudeTexto(system, messages) {
   const headers = { headers: { 'x-api-key': ANTHROPIC_KEY, 'anthropic-version': '2023-06-01', 'Content-Type': 'application/json' }, timeout: 30000 };
-  const base = { max_tokens: 500, system, messages };
+  const base = { max_tokens: 2000, system, messages };
   // Llama al modelo con reintentos ante errores transitorios (sobrecarga/límite/red).
   async function pedir(model) {
     let err;
@@ -586,7 +586,7 @@ app.post('/webhook', async (req, res) => {
           'https://api.anthropic.com/v1/messages',
           {
             model: MODEL_VISION,
-            max_tokens: 300,
+            max_tokens: 1000,
             messages: [{
               role: 'user',
               content: [
@@ -598,7 +598,7 @@ app.post('/webhook', async (req, res) => {
           { headers: { 'x-api-key': ANTHROPIC_KEY, 'anthropic-version': '2023-06-01', 'Content-Type': 'application/json' } }
         );
 
-        const respVision = data.content[0].text || '';
+        const respVision = (data.content.find(c => c.type === 'text')?.text) || '';
         let info = { comprobante: false, monto: null, banco: null };
         try { const m = respVision.match(/\{[\s\S]*\}/); if (m) info = JSON.parse(m[0]); }
         catch (_) { info.comprobante = /true|"si"|\bsi\b/i.test(respVision); }
@@ -658,7 +658,8 @@ app.post('/webhook', async (req, res) => {
     // Separamos las señales internas del texto que ve el cliente.
     let resumenInicial = null, resumenCompleto = null, avisarMotivo = null, mandarCarta = false;
     const limpias = [];
-    for (const ln of (data.content[0].text || '').split('\n')) {
+    const textoIA = (data.content.find(c => c.type === 'text')?.text) || '';
+    for (const ln of textoIA.split('\n')) {
       const s = ln.trim();
       if (s.startsWith('@@COMPLETO@@'))      resumenCompleto = s.replace('@@COMPLETO@@', '').trim();
       else if (s.startsWith('@@INICIAL@@'))  resumenInicial  = s.replace('@@INICIAL@@', '').trim();
